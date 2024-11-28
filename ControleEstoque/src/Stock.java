@@ -1,4 +1,9 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,19 +22,13 @@ public class Stock {
         return products;
     }
 
-    public void displayStock() {
-        System.out.println("Saldo disponível: R$" + availableMoney);
-        for (Product item : products) {
-            System.out.println(item.getName() + " - " + item.getCategory() + " - Quantidade em estoque: " + item.getQuantity() +
-                    " - Preço unitário: R$" + item.getPrice());
-        }
-    }
-
     private void saveStockInFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write("money:" + availableMoney + "\n");
             for (Product item : products) {
-                writer.write(item.getName() + "," + item.getCategory() + "," + item.getQuantity() + "," + item.getPrice() + "\n");
+                writer.write(
+                        item.getId() + "," + item.getName() + "," + item.getCategory() + "," + item.getQuantity() + ","
+                                + item.getPrice() + "\n");
             }
         } catch (IOException e) {
             System.out.println("Erro ao escrever item no arquivo: " + e.getMessage());
@@ -38,7 +37,8 @@ public class Stock {
 
     private void getProductsStock() {
         File file = new File(fileName);
-        if (!file.exists()) return;
+        if (!file.exists())
+            return;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
@@ -47,11 +47,11 @@ public class Stock {
             }
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                String id = parts[0];
+                int id = Integer.parseInt(parts[0]);
                 String name = parts[1];
-                double price = Double.parseDouble(parts[2]);
-                String category = parts[3];
-                int quantity = Integer.parseInt(parts[4]);
+                String category = parts[2];
+                int quantity = Integer.parseInt(parts[3]);
+                double price = Double.parseDouble(parts[4]);
 
                 if (category.equals("Electronics")) {
                     products.add(new Electronics(id, name, price, quantity));
@@ -66,11 +66,43 @@ public class Stock {
         }
     }
 
-    public void buyItem(Product item, int quantity) {
+    public void displayStock() {
+        System.out.println("Saldo disponível: R$" + availableMoney);
+        for (Product item : products) {
+            System.out.println(
+                    item.getId() + " - " +
+                            item.getName() + " - " +
+                            item.getCategory() +
+                            " - Quantidade em estoque: " + item.getQuantity() +
+                            " - Preço unitário: R$" + item.getPrice());
+        }
+    }
+
+    public Product findItem(int id) {
+        for (Product item : products) {
+            if (item.getId() == id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public void apllyDiscount(int id, int percentage) {
+        Product item = findItem(id);
+        if (item != null) {
+            item.applyDiscount(percentage);
+            saveStockInFile();
+        } else {
+            System.out.println("Produto não encontrado.");
+        }
+    }
+
+    public void addItem(Product item) {
+        int quantity = item.getQuantity();
         double cost = item.getPrice() * quantity;
         if (availableMoney >= cost) {
             availableMoney -= cost;
-            Product existingItem = findItem(item.getName());
+            Product existingItem = findItem(item.getId());
             if (existingItem != null) {
                 existingItem.addQuantity(quantity);
             } else {
@@ -82,8 +114,8 @@ public class Stock {
         }
     }
 
-    public void sellItem(String name, int quantity) {
-        Product item = findItem(name);
+    public void sellItem(int id, int quantity) {
+        Product item = findItem(id);
 
         if (item != null && item.getQuantity() >= quantity) {
             double newMoney = item.getPrice() * quantity;
@@ -95,17 +127,7 @@ public class Stock {
             }
             saveStockInFile();
         } else {
-            System.out.println("Estoque insuficiente para vender " + quantity + " " + name);
+            System.out.println("Estoque insuficiente para vender " + quantity + " produtos.");
         }
     }
-
-    public Product findItem(String name) {
-        for (Product item : products) {
-            if (item.getName().equals(name)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
 }

@@ -1,0 +1,2 @@
+money:9600.0
+123,Teste,Eletrônicos,10,36.0

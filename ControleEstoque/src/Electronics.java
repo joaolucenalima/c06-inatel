@@ -1,5 +1,5 @@
 public class Electronics extends Product {
-    public Electronics(String id, String name, double price, int quantity) {
+    public Electronics(int id, String name, double price, int quantity) {
         super(id, name, price, quantity);
     }
 
