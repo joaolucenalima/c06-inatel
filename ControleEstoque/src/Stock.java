@@ -53,11 +53,11 @@ public class Stock {
                 int quantity = Integer.parseInt(parts[3]);
                 double price = Double.parseDouble(parts[4]);
 
-                if (category.equals("Electronics")) {
+                if (category.equals("Eletrônico")) {
                     products.add(new Electronics(id, name, price, quantity));
                 }
 
-                if (category.equals("Food")) {
+                if (category.equals("Alimento")) {
                     products.add(new Food(id, name, price, quantity));
                 }
             }

@@ -71,6 +71,7 @@ public class Main {
                     stock.apllyDiscount(id, discount);
                     break;
                 case 4:
+                    System.out.println(stock.getProducts());
                     stock.displayStock();
                     break;
                 case 5:

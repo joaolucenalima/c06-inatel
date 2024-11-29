@@ -5,6 +5,6 @@ public class Electronics extends Product {
 
     @Override
     public String getCategory() {
-        return "Eletrônicos";
+        return "Eletrônico";
     }
 }
